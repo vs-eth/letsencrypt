@@ -1,0 +1,23 @@
+---
+letsencrypt_domain: "{{ ansible_fqdn }}"
+letsencrypt_port: "80"
+letsencrypt_base_dir: "/root/.acme.sh"
+
+letsencrypt_staging: False
+letsencrypt_issue_mode: "webroot"
+letsencrypt_install_mode: "install"
+letsencrypt_webroot: ""
+
+letsencrypt_issue:
+  prehook: ""
+  posthook: ""
+
+letsencrypt_install:
+  cert_path: ""
+  key_path: ""
+  fullchain_path: ""
+  reloadcmd: ""
+
+letsencrypt_deploy:
+  hook: ""
+
