@@ -15,7 +15,7 @@
 
 - name: install deploy scripts
   copy:
-    src: "deploy_{{ item }}.sh"
+    src: deploy_{{ item }}.sh
     dest: "{{ letsencrypt_base_dir }}/deploy/{{ item }}.sh"
     mode: 0500
   with_items:
@@ -25,7 +25,8 @@
   command: >
     {{ letsencrypt_base_dir }}/acme.sh --issue
       -d "{{ letsencrypt_domain }}"
-      "{{ '--staging' if letsencrypt_staging }}"
+      {{ '--staging' if letsencrypt_staging else None }}
+      {{ '--force' if letsencrypt_force else None }}
       -w "{{ letsencrypt_webroot }}"
       --pre-hook "{{ letsencrypt_issue.prehook }}"
       --post-hook "{{ letsencrypt_issue.posthook }}"
@@ -38,7 +39,8 @@
   command: >
     {{ letsencrypt_base_dir }}/acme.sh --issue
       -d "{{ letsencrypt_domain }}"
-      "{{ '--staging' if letsencrypt_staging }}"
+      {{ '--staging' if letsencrypt_staging else None }}
+      {{ '--force' if letsencrypt_force else None }}
       --standalone
       --httpport {{ letsencrypt_port }}
       --pre-hook "{{ letsencrypt_issue.prehook }}"
