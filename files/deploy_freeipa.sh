@@ -15,6 +15,18 @@ freeipa_deploy() {
 
   _cwd="${0%/*}/${_cdomain}"
 
+  # Start Apache again since ipa-certupdate does JSON requests
+  systemctl start httpd
+
+  ipa-cacert-manage install "${_cwd}/isrgrootx1.cer" -n ISRGRootX1 -t ,,
+  ipa-certupdate
+  ipa-cacert-manage install "${_cwd}/DSTRootCAX3.cer" -n DSTRootCAX3 -t C,,
+  ipa-certupdate
+  ipa-cacert-manage install "${_cwd}/LetsEncryptAuthorityX3.cer" -n LetsEncryptX3 -t C,,
+  ipa-certupdate
+  ipa-cacert-manage install "${_cwd}/LetsEncryptAuthorityX4.cer" -n LetsEncryptX4 -t C,,
+  ipa-certupdate
+
   # delete old cert
   certutil -D -d "/etc/httpd/alias/" -n Server-Cert
 
@@ -25,6 +37,6 @@ freeipa_deploy() {
 
   pk12util -i "${_cwd}/${_cdomain}.p12" -d "/etc/httpd/alias/" -k "/etc/httpd/alias/pwdfile.txt" -W ""
 
-  systemctl start httpd
+  systemctl restart httpd
 }
 

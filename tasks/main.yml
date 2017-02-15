@@ -7,7 +7,7 @@
   register: download
 
 - name: install acme.sh
-  shell: INSTALLONLINE=1 /tmp/acme.sh --install
+  shell: INSTALLONLINE=1 /tmp/acme.sh
            --home "{{ letsencrypt_base_dir }}"
   args:
     chdir: "/tmp"
@@ -20,6 +20,16 @@
     mode: 0500
   with_items:
     - freeipa
+
+- name: copy root certificates
+  copy:
+    src: "{{ item }}"
+    dest: "{{ letsencrypt_base_dir}}/{{ letsencrypt_domain }}/"
+  with_items:
+    - DSTRootCAX3.cer
+    - isrgrootx1.cer
+    - LetsEncryptAuthorityX3.cer
+    - LetsEncryptAuthorityX4.cer
 
 - name: issue the certificate (webroot)
   command: >
