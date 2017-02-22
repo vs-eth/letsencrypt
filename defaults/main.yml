@@ -1,5 +1,6 @@
 ---
 letsencrypt_domain: "{{ ansible_fqdn }}"
+letsencrypt_domain_extra: False
 letsencrypt_port: "80"
 letsencrypt_base_dir: "/root/.acme.sh"
 
