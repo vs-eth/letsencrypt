@@ -21,6 +21,7 @@
   with_items:
     - freeipa
     - freeipa_staging
+    - ejabberd
 
 - set_fact:
     certs_to_copy:
