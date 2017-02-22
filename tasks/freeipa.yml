@@ -1,0 +1,14 @@
+- include_vars:
+    file: "{{ item }}"
+  no_log: True
+  with_items:
+    - freeipa_secrets.yml
+
+- name: deploy the certificate
+  command: >
+    {{ letsencrypt_base_dir }}/acme.sh --deploy
+      -d "{{ letsencrypt_domain }}"
+      --deploy-hook "{{ letsencrypt_deploy.staging_hook if letsencrypt_staging else letsencrypt_deploy.hook }}"
+  environment:
+    DIRMAN_PASSWORD: "{{ freeipa_secrets.dm_password }}"
+  when: letsencrypt_install_mode == "deploy" and issue.changed

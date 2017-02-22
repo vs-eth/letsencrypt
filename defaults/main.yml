@@ -20,5 +20,6 @@ letsencrypt_install:
 
 letsencrypt_deploy:
   hook: ""
+  staging_hook: ""
 
 letsencrypt_force: False

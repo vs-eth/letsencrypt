@@ -20,16 +20,27 @@
     mode: 0500
   with_items:
     - freeipa
+    - freeipa_staging
+
+- set_fact:
+    certs_to_copy:
+        - DSTRootCAX3.cer
+        - isrgrootx1.cer
+        - LetsEncryptAuthorityX3.cer
+        - LetsEncryptAuthorityX4.cer
+  when: not letsencrypt_staging
+
+- set_fact:
+    certs_to_copy:
+        - fakelerootx1.cer
+        - fakeleintermediatex1.cer
+  when: letsencrypt_staging
 
 - name: copy root certificates
   copy:
     src: "{{ item }}"
     dest: "{{ letsencrypt_base_dir}}/{{ letsencrypt_domain }}/"
-  with_items:
-    - DSTRootCAX3.cer
-    - isrgrootx1.cer
-    - LetsEncryptAuthorityX3.cer
-    - LetsEncryptAuthorityX4.cer
+  with_items: "{{ certs_to_copy }}"
 
 - name: issue the certificate (webroot)
   command: >
@@ -74,5 +85,8 @@
   command: >
     {{ letsencrypt_base_dir }}/acme.sh --deploy
       -d "{{ letsencrypt_domain }}"
-      --deploy-hook "{{ letsencrypt_deploy.hook }}"
-  when: letsencrypt_install_mode == "deploy" and issue.changed
+      --deploy-hook "{{ letsencrypt_deploy.staging_hook if letsencrypt_staging else letsencrypt_deploy.hook }}"
+  when: letsencrypt_install_mode == "deploy" and issue.changed and letsencrypt_deploy.hook != "freeipa" and letsencrypt_deploy.staging_hook != "freeipa_staging"
+
+- include: freeipa.yml
+  when: letsencrypt_deploy.hook == "freeipa" and letsencrypt_deploy.staging_hook == "freeipa_staging"
