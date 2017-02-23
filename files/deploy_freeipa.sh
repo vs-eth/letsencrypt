@@ -18,7 +18,7 @@ freeipa_deploy() {
   # Start Apache again since ipa-certupdate does JSON requests
   systemctl start httpd
 
-  ipa-cacert-manage install "${_cwd}/isrgrootx1.cer" -n ISRGRootX1 -t ,,
+  ipa-cacert-manage install "${_cwd}/isrgrootx1.cer" -n ISRGRootX1 -t C,,
   ipa-certupdate
   ipa-cacert-manage install "${_cwd}/DSTRootCAX3.cer" -n DSTRootCAX3 -t C,,
   ipa-certupdate
@@ -27,15 +27,7 @@ freeipa_deploy() {
   ipa-cacert-manage install "${_cwd}/LetsEncryptAuthorityX4.cer" -n LetsEncryptX4 -t C,,
   ipa-certupdate
 
-  # delete old cert
-  certutil -D -d "/etc/httpd/alias/" -n Server-Cert
-
-  # add new cert
-  certutil -A -d "/etc/httpd/alias/" -n Server-Cert -t u,u,u -i "$_ccert"
-
-  openssl pkcs12 -export -out "${_cwd}/${_cdomain}.p12" -inkey "$_ckey" -in "$_ccert" -certfile "$_cca" -password pass:
-
-  pk12util -i "${_cwd}/${_cdomain}.p12" -d "/etc/httpd/alias/" -k "/etc/httpd/alias/pwdfile.txt" -W ""
+  ipa-server-certinstall -d -w "$_ckey" "$_ccert" --dirman-password=${DIRMAN_PASSWORD} --pin=
 
   systemctl restart httpd
 }
