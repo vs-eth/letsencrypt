@@ -21,6 +21,7 @@
   with_items:
     - freeipa
     - freeipa_staging
+    - ejabberd
 
 - set_fact:
     certs_to_copy:
@@ -46,29 +47,31 @@
   command: >
     {{ letsencrypt_base_dir }}/acme.sh --issue
       -d "{{ letsencrypt_domain }}"
+      {{ "-d " + letsencrypt_domain_extra if letsencrypt_domain_extra else None }}
       {{ '--staging' if letsencrypt_staging else None }}
       {{ '--force' if letsencrypt_force else None }}
       -w "{{ letsencrypt_webroot }}"
       --pre-hook "{{ letsencrypt_issue.prehook }}"
       --post-hook "{{ letsencrypt_issue.posthook }}"
-  register: issue
-  failed_when: issue.rc == 1
-  changed_when: issue.rc == 0
+  register: issueW
+  failed_when: issueW.rc == 1
+  changed_when: issueW.rc == 0
   when: letsencrypt_issue_mode == "webroot"
 
 - name: issue the certificate (standalone)
   command: >
     {{ letsencrypt_base_dir }}/acme.sh --issue
       -d "{{ letsencrypt_domain }}"
+      {{ "-d " + letsencrypt_domain_extra if letsencrypt_domain_extra else None }}
       {{ '--staging' if letsencrypt_staging else None }}
       {{ '--force' if letsencrypt_force else None }}
       --standalone
       --httpport {{ letsencrypt_port }}
       --pre-hook "{{ letsencrypt_issue.prehook }}"
       --post-hook "{{ letsencrypt_issue.posthook }}"
-  register: issue
-  failed_when: issue.rc == 1
-  changed_when: issue.rc == 0
+  register: issueS
+  failed_when: issueS.rc == 1
+  changed_when: issueS.rc == 0
   when: letsencrypt_issue_mode == "standalone"
 
 - name: install the certificate
@@ -86,7 +89,7 @@
     {{ letsencrypt_base_dir }}/acme.sh --deploy
       -d "{{ letsencrypt_domain }}"
       --deploy-hook "{{ letsencrypt_deploy.staging_hook if letsencrypt_staging else letsencrypt_deploy.hook }}"
-  when: letsencrypt_install_mode == "deploy" and issue.changed and letsencrypt_deploy.hook != "freeipa" and letsencrypt_deploy.staging_hook != "freeipa_staging"
+  when: letsencrypt_install_mode == "deploy" and (issueW.changed or issueS.changed) and letsencrypt_deploy.hook != "freeipa" and letsencrypt_deploy.staging_hook != "freeipa_staging"
 
 - include: freeipa.yml
   when: letsencrypt_deploy.hook == "freeipa" and letsencrypt_deploy.staging_hook == "freeipa_staging"
