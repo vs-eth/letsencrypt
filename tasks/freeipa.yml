@@ -1,8 +1,18 @@
-- include_vars:
+- name: Load settings (prod)
+  include_vars:
     file: "{{ item }}"
   no_log: True
   with_items:
     - freeipa_secrets.yml
+  when: "'test' not in group_names"
+
+- name: Load settings (test)
+  include_vars:
+    file: "{{ item }}"
+  no_log: True
+  with_items:
+    - freeipa_secrets_test.yml
+  when: "'test' in group_names"
 
 - name: deploy the certificate
   command: >
@@ -11,4 +21,4 @@
       --deploy-hook "{{ letsencrypt_deploy.staging_hook if letsencrypt_staging else letsencrypt_deploy.hook }}"
   environment:
     DIRMAN_PASSWORD: "{{ freeipa_secrets.dm_password }}"
-  when: letsencrypt_install_mode == "deploy" and issue.changed
+  when: letsencrypt_install_mode == "deploy" and (issueW.changed or issueS.changed)
