@@ -22,6 +22,7 @@
     - freeipa
     - freeipa_staging
     - ejabberd
+    - mailserver
 
 - set_fact:
     certs_to_copy:
