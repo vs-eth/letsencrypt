@@ -1,25 +1,17 @@
 ---
-- set_fact:
-    certs_to_copy:
-        - DSTRootCAX3.cer
-        - isrgrootx1.cer
-        - LetsEncryptAuthorityX3.cer
-        - LetsEncryptAuthorityX4.cer
-  when: not letsencrypt_staging
-
-- set_fact:
-    certs_to_copy:
-        - fakelerootx1.cer
-        - fakeleintermediatex1.cer
-  when: letsencrypt_staging
 - include: install.yml
 
 - name: copy root certificates
   copy:
     src: "{{ item }}"
     dest: "{{ letsencrypt_base_dir}}/{{ letsencrypt_domain }}/"
-  with_items: "{{ certs_to_copy }}"
+  with_items: "{{ letsencrypt_staging | ternary(certs_staging, certs_prod) }}"
 
+- name: remove root certificates
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:  "{{ letsencrypt_staging | ternary(certs_prod, certs_staging) }}"
 
 - include: issue.yml
 
