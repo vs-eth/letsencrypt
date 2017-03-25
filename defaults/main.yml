@@ -16,7 +16,8 @@ letsencrypt_issue:
 letsencrypt_install:
   cert_path: "/etc/ssl/certs/{{ letsencrypt_domain | replace('.', '_') }}.cer"
   key_path: "/etc/ssl/private/{{ letsencrypt_domain | replace('.', '_') }}.key"
-  fullchain_path: "/etc/ssl/certs/letsencrypt.cer"
+  ca_path: "/etc/ssl/certs/letsencrypt.cer"
+  fullchain_path: "/etc/ssl/certs/{{ letsencrypt_domain | replace('.', '_') }}_fullchain.cer"
 
 letsencrypt_reloadcmd: ""
 

@@ -19,9 +19,10 @@
   command: >
     {{ letsencrypt_base_dir }}/acme.sh --install-cert
       -d "{{ letsencrypt_domain }}"
-      --certpath "{{ letsencrypt_install.cert_path }}"
-      --keypath "{{ letsencrypt_install.key_path }}"
-      --fullchainpath "{{ letsencrypt_install.fullchain_path }}"
+      --cert-file "{{ letsencrypt_install.cert_path }}"
+      --key-file "{{ letsencrypt_install.key_path }}"
+      --ca-file "{{ letsencrypt_install.ca_path }}"
+      --fullchain-file "{{ letsencrypt_install.fullchain_path }}"
       --reloadcmd "{{ letsencrypt_reloadcmd }}"
   when: letsencrypt_install_mode == "install" and issueW.changed
 
