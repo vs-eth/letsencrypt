@@ -1,28 +1,4 @@
 ---
-- name: download acme.sh
-  get_url:
-    url: https://raw.githubusercontent.com/Neilpang/acme.sh/master/acme.sh
-    dest: /tmp/acme.sh
-    mode: 0500
-  register: download
-
-- name: install acme.sh
-  shell: INSTALLONLINE=1 /tmp/acme.sh
-           --home "{{ letsencrypt_base_dir }}"
-  args:
-    chdir: "/tmp"
-  when: download.changed
-
-- name: install deploy scripts
-  copy:
-    src: deploy_{{ item }}.sh
-    dest: "{{ letsencrypt_base_dir }}/deploy/{{ item }}.sh"
-    mode: 0500
-  with_items:
-    - freeipa
-    - freeipa_staging
-    - ejabberd
-
 - set_fact:
     certs_to_copy:
         - DSTRootCAX3.cer
@@ -36,6 +12,7 @@
         - fakelerootx1.cer
         - fakeleintermediatex1.cer
   when: letsencrypt_staging
+- include: install.yml
 
 - name: copy root certificates
   copy:
