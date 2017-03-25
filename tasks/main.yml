@@ -81,8 +81,8 @@
       --certpath "{{ letsencrypt_install.cert_path }}"
       --keypath "{{ letsencrypt_install.key_path }}"
       --fullchainpath "{{ letsencrypt_install.fullchain_path }}"
-      --reloadcmd "{{ letsencrypt_install.reloadcmd }}"
-  when: letsencrypt_install_mode == "install" and issue.changed
+      --reloadcmd "{{ letsencrypt_reloadcmd }}"
+  when: letsencrypt_install_mode == "install" and issueW.changed
 
 - name: deploy the certificate
   command: >
