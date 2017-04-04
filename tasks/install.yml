@@ -22,3 +22,4 @@
     - freeipa
     - freeipa_staging
     - ejabberd
+    - mailserver
