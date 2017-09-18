@@ -30,5 +30,6 @@ freeipa_deploy() {
   ipa-server-certinstall -d -w "$_ckey" "$_ccert" --dirman-password=${DIRMAN_PASSWORD} --pin=
 
   systemctl restart httpd
+  systemctl restart dirsrv@${DIRSRV_INSTANCE}.service
 }
 
