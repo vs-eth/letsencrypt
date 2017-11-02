@@ -16,7 +16,7 @@
 
 - assert:
     that:
-      - "freeipa_deploy.dirsrv_instance is defined"
+      - "letsencrypt_deploy.dirsrv_instance is defined"
 
 - name: deploy the certificate
   command: >
@@ -25,5 +25,5 @@
       --deploy-hook "{{ letsencrypt_deploy.staging_hook if letsencrypt_staging else letsencrypt_deploy.hook }}"
   environment:
     DIRMAN_PASSWORD: "{{ freeipa_secrets.dm_password }}"
-    DIRSRV_INSTANCE: "{{ freeipa_deploy.dirsrv_instance }}"
+    DIRSRV_INSTANCE: "{{ letsencrypt_deploy.dirsrv_instance }}"
   when: letsencrypt_install_mode == "deploy" and (issueW.changed or issueS.changed)
