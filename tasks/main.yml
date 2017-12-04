@@ -1,5 +1,5 @@
 ---
-- include: install.yml
+- import_tasks: install.yml
 
 - name: copy root certificates
   copy:
@@ -13,7 +13,7 @@
     state: absent
   with_items:  "{{ letsencrypt_staging | ternary(certs_prod, certs_staging) }}"
 
-- include: issue.yml
+- import_tasks: issue.yml
 
 - name: install the certificate
   command: >
@@ -33,5 +33,5 @@
       --deploy-hook "{{ letsencrypt_deploy.staging_hook if letsencrypt_staging else letsencrypt_deploy.hook }}"
   when: letsencrypt_install_mode == "deploy" and (issueW.changed or issueS.changed) and letsencrypt_deploy.hook != "freeipa" and letsencrypt_deploy.staging_hook != "freeipa_staging"
 
-- include: freeipa.yml
+- import_tasks: freeipa.yml
   when: letsencrypt_deploy.hook == "freeipa" and letsencrypt_deploy.staging_hook == "freeipa_staging"
