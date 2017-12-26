@@ -1,89 +1,30 @@
 ---
-- name: download acme.sh
-  get_url:
-    url: https://raw.githubusercontent.com/Neilpang/acme.sh/master/acme.sh
-    dest: /tmp/acme.sh
-    mode: 0500
-  register: download
-
-- name: install acme.sh
-  shell: INSTALLONLINE=1 /tmp/acme.sh
-           --home "{{ letsencrypt_base_dir }}"
-  args:
-    chdir: "/tmp"
-  when: download.changed
-
-- name: install deploy scripts
-  copy:
-    src: deploy_{{ item }}.sh
-    dest: "{{ letsencrypt_base_dir }}/deploy/{{ item }}.sh"
-    mode: 0500
-  with_items:
-    - freeipa
-    - freeipa_staging
-    - ejabberd
-    - mailserver
-
-- set_fact:
-    certs_to_copy:
-        - DSTRootCAX3.cer
-        - isrgrootx1.cer
-        - LetsEncryptAuthorityX3.cer
-        - LetsEncryptAuthorityX4.cer
-  when: not letsencrypt_staging
-
-- set_fact:
-    certs_to_copy:
-        - fakelerootx1.cer
-        - fakeleintermediatex1.cer
-  when: letsencrypt_staging
+- import_tasks: install.yml
 
 - name: copy root certificates
   copy:
     src: "{{ item }}"
     dest: "{{ letsencrypt_base_dir}}/{{ letsencrypt_domain }}/"
-  with_items: "{{ certs_to_copy }}"
+  with_items: "{{ letsencrypt_staging | ternary(certs_staging, certs_prod) }}"
 
-- name: issue the certificate (webroot)
-  command: >
-    {{ letsencrypt_base_dir }}/acme.sh --issue
-      -d "{{ letsencrypt_domain }}"
-      {{ "-d " + letsencrypt_domain_extra if letsencrypt_domain_extra else None }}
-      {{ '--staging' if letsencrypt_staging else None }}
-      {{ '--force' if letsencrypt_force else None }}
-      -w "{{ letsencrypt_webroot }}"
-      --pre-hook "{{ letsencrypt_issue.prehook }}"
-      --post-hook "{{ letsencrypt_issue.posthook }}"
-  register: issueW
-  failed_when: issueW.rc == 1
-  changed_when: issueW.rc == 0
-  when: letsencrypt_issue_mode == "webroot"
+- name: remove root certificates
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:  "{{ letsencrypt_staging | ternary(certs_prod, certs_staging) }}"
 
-- name: issue the certificate (standalone)
-  command: >
-    {{ letsencrypt_base_dir }}/acme.sh --issue
-      -d "{{ letsencrypt_domain }}"
-      {{ "-d " + letsencrypt_domain_extra if letsencrypt_domain_extra else None }}
-      {{ '--staging' if letsencrypt_staging else None }}
-      {{ '--force' if letsencrypt_force else None }}
-      --standalone
-      --httpport {{ letsencrypt_port }}
-      --pre-hook "{{ letsencrypt_issue.prehook }}"
-      --post-hook "{{ letsencrypt_issue.posthook }}"
-  register: issueS
-  failed_when: issueS.rc == 1
-  changed_when: issueS.rc == 0
-  when: letsencrypt_issue_mode == "standalone"
+- import_tasks: issue.yml
 
 - name: install the certificate
   command: >
     {{ letsencrypt_base_dir }}/acme.sh --install-cert
       -d "{{ letsencrypt_domain }}"
-      --certpath "{{ letsencrypt_install.cert_path }}"
-      --keypath "{{ letsencrypt_install.key_path }}"
-      --fullchainpath "{{ letsencrypt_install.fullchain_path }}"
-      --reloadcmd "{{ letsencrypt_install.reloadcmd }}"
-  when: letsencrypt_install_mode == "install" and issue.changed
+      --cert-file "{{ letsencrypt_install.cert_path }}"
+      --key-file "{{ letsencrypt_install.key_path }}"
+      --ca-file "{{ letsencrypt_install.ca_path }}"
+      --fullchain-file "{{ letsencrypt_install.fullchain_path }}"
+      --reloadcmd "{{ letsencrypt_reloadcmd }}"
+  when: letsencrypt_install_mode == "install" and issueW.changed
 
 - name: deploy the certificate
   command: >
@@ -92,5 +33,5 @@
       --deploy-hook "{{ letsencrypt_deploy.staging_hook if letsencrypt_staging else letsencrypt_deploy.hook }}"
   when: letsencrypt_install_mode == "deploy" and (issueW.changed or issueS.changed) and letsencrypt_deploy.hook != "freeipa" and letsencrypt_deploy.staging_hook != "freeipa_staging"
 
-- include: freeipa.yml
+- import_tasks: freeipa.yml
   when: letsencrypt_deploy.hook == "freeipa" and letsencrypt_deploy.staging_hook == "freeipa_staging"

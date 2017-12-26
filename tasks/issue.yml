@@ -1,0 +1,31 @@
+---
+- name: issue the certificate (webroot)
+  command: >
+    {{ letsencrypt_base_dir }}/acme.sh --issue
+      -d "{{ letsencrypt_domain }}"
+      {{ "-d " + letsencrypt_domain_extra if letsencrypt_domain_extra else None }}
+      {{ '--staging' if letsencrypt_staging else None }}
+      {{ '--force' if letsencrypt_force else None }}
+      -w "{{ letsencrypt_webroot }}"
+      --pre-hook "{{ letsencrypt_issue.prehook }}"
+      --post-hook "{{ letsencrypt_issue.posthook }}"
+  register: issueW
+  failed_when: issueW.rc == 1
+  changed_when: issueW.rc == 0
+  when: letsencrypt_issue_mode == "webroot"
+
+- name: issue the certificate (standalone)
+  command: >
+    {{ letsencrypt_base_dir }}/acme.sh --issue
+      -d "{{ letsencrypt_domain }}"
+      {{ "-d " + letsencrypt_domain_extra if letsencrypt_domain_extra else None }}
+      {{ '--staging' if letsencrypt_staging else None }}
+      {{ '--force' if letsencrypt_force else None }}
+      --standalone
+      --httpport {{ letsencrypt_port }}
+      --pre-hook "{{ letsencrypt_issue.prehook }}"
+      --post-hook "{{ letsencrypt_issue.posthook }}"
+  register: issueS
+  failed_when: issueS.rc == 1
+  changed_when: issueS.rc == 0
+  when: letsencrypt_issue_mode == "standalone"

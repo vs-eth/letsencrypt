@@ -4,7 +4,7 @@
   no_log: True
   with_items:
     - freeipa_secrets.yml
-  when: "'test' not in group_names"
+  when: "'production' in inventory_file"
 
 - name: Load settings (test)
   include_vars:
@@ -12,7 +12,11 @@
   no_log: True
   with_items:
     - freeipa_secrets_test.yml
-  when: "'test' in group_names"
+  when: "'test' in inventory_file"
+
+- assert:
+    that:
+      - "letsencrypt_deploy.dirsrv_instance is defined"
 
 - name: deploy the certificate
   command: >
@@ -21,4 +25,5 @@
       --deploy-hook "{{ letsencrypt_deploy.staging_hook if letsencrypt_staging else letsencrypt_deploy.hook }}"
   environment:
     DIRMAN_PASSWORD: "{{ freeipa_secrets.dm_password }}"
+    DIRSRV_INSTANCE: "{{ letsencrypt_deploy.dirsrv_instance }}"
   when: letsencrypt_install_mode == "deploy" and (issueW.changed or issueS.changed)
