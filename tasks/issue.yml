@@ -3,7 +3,7 @@
   command: >
     {{ letsencrypt_base_dir }}/acme.sh --issue
       -d "{{ letsencrypt_domain }}"
-      {{ "-d " + letsencrypt_domain_extra if letsencrypt_domain_extra else None }}
+      {% for item in letsencrypt_domain_extra %} -d {{ item }}{% endfor %}
       {{ '--staging' if letsencrypt_staging else None }}
       {{ '--force' if letsencrypt_force else None }}
       -w "{{ letsencrypt_webroot }}"
@@ -18,7 +18,7 @@
   command: >
     {{ letsencrypt_base_dir }}/acme.sh --issue
       -d "{{ letsencrypt_domain }}"
-      {{ "-d " + letsencrypt_domain_extra if letsencrypt_domain_extra else None }}
+      {% for item in letsencrypt_domain_extra %} -d {{ item }}{% endfor %}
       {{ '--staging' if letsencrypt_staging else None }}
       {{ '--force' if letsencrypt_force else None }}
       --standalone
