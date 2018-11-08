@@ -1,5 +1,6 @@
 ---
 - name: issue the certificate (webroot)
+  become: True
   command: >
     {{ letsencrypt_base_dir }}/acme.sh --issue
       -d "{{ letsencrypt_domain }}"
@@ -15,6 +16,7 @@
   when: letsencrypt_issue_mode == "webroot"
 
 - name: issue the certificate (standalone)
+  become: True
   command: >
     {{ letsencrypt_base_dir }}/acme.sh --issue
       -d "{{ letsencrypt_domain }}"

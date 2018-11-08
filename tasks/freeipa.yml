@@ -19,6 +19,7 @@
       - "letsencrypt_deploy.dirsrv_instance is defined"
 
 - name: deploy the certificate
+  become: True
   command: >
     {{ letsencrypt_base_dir }}/acme.sh --deploy
       -d "{{ letsencrypt_domain }}"

@@ -1,5 +1,6 @@
 ---
 - name: download acme.sh
+  become: True
   get_url:
     url: https://raw.githubusercontent.com/Neilpang/acme.sh/master/acme.sh
     dest: /tmp/acme.sh
@@ -7,6 +8,7 @@
   register: download
 
 - name: install acme.sh
+  become: True
   shell: INSTALLONLINE=1 /tmp/acme.sh
            --home "{{ letsencrypt_base_dir }}"
   args:
@@ -14,6 +16,7 @@
   when: download.changed
 
 - name: install deploy scripts
+  become: True
   copy:
     src: deploy_{{ item }}.sh
     dest: "{{ letsencrypt_base_dir }}/deploy/{{ item }}.sh"
