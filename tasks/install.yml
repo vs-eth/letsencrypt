@@ -10,6 +10,7 @@
 - name: install acme.sh
   become: True
   shell: INSTALLONLINE=1 /tmp/acme.sh
+           --install
            --home "{{ letsencrypt_base_dir }}"
   args:
     chdir: "/tmp"
