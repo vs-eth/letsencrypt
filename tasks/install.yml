@@ -16,6 +16,12 @@
     chdir: "/tmp"
   when: download.changed
 
+- name: Ensure deploy-directory exists
+  file:
+    path: "{{ letsencrypt_base_dir }}/deploy"
+    state: directory
+  become: true
+
 - name: install deploy scripts
   become: True
   copy:
