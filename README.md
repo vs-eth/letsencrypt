@@ -18,6 +18,7 @@ Role to setup Let's Encrypt certificates
 |letsencrypt_reloadcmd|Empty|Command to execute after installing new certificates (if installing)|
 |letsencrypt_deploy|Empty|Hooks to use (if using deploy mode)|
 |letsencrypt_force|`False`|Force-renew certificate. Useful when switching from staging to production|
+|letsencrypt_default_ca|`letsencrypt`|Default CA that will be used to issue the certificate. May be changed to e.g. `zerossl` to avoid rate limits but requires registration|
 
 ### Issurance modes
 For certificate issurance, this role supports a "standalone" mode, where a
