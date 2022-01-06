@@ -33,3 +33,10 @@
     - freeipa_staging
     - ejabberd
     - mailserver
+
+- name: Set default CA
+  become: True
+  command: >
+    {{ letsencrypt_base_dir }}/acme.sh
+      --set-default-ca --server "{{ letsencrypt_default_ca }}"
+  when: letsencrypt_default_ca is defined and download.changed

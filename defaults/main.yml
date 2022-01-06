@@ -26,3 +26,4 @@ letsencrypt_deploy:
   staging_hook: ""
 
 letsencrypt_force: False
+letsencrypt_default_ca: letsencrypt
