@@ -1,9 +1,6 @@
 ---
 certs_prod:
-  - DSTRootCAX3.cer
   - isrgrootx1.cer
-  - LetsEncryptAuthorityX3.cer
-  - LetsEncryptAuthorityX4.cer
 
 certs_staging:
   - fakelerootx1.cer

@@ -20,12 +20,6 @@ freeipa_deploy() {
 
   ipa-cacert-manage install "${_cwd}/isrgrootx1.cer" -n ISRGRootX1 -t C,,
   ipa-certupdate
-  ipa-cacert-manage install "${_cwd}/DSTRootCAX3.cer" -n DSTRootCAX3 -t C,,
-  ipa-certupdate
-  ipa-cacert-manage install "${_cwd}/LetsEncryptAuthorityX3.cer" -n LetsEncryptX3 -t C,,
-  ipa-certupdate
-  ipa-cacert-manage install "${_cwd}/LetsEncryptAuthorityX4.cer" -n LetsEncryptX4 -t C,,
-  ipa-certupdate
 
   ipa-server-certinstall -d -w "$_ckey" "$_ccert" --dirman-password=${DIRMAN_PASSWORD} --pin=
 
