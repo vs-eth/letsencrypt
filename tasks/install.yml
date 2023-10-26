@@ -16,9 +16,7 @@
 
 - name: Install acme.sh
   become: true
-  shell: INSTALLONLINE=1 /tmp/acme.sh
-           --install
-           --home "{{ letsencrypt_base_dir }}"
+  ansible.builtin.command: /tmp/acme.sh --install --home "{{ letsencrypt_base_dir }}"
   args:
     chdir: "/tmp"
   environment:
