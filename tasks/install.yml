@@ -1,40 +1,44 @@
 ---
-- name: install socat
+- name: Install socat
   become: true
   ansible.builtin.apt:
     name: socat
     state: present
   when: letsencrypt_issue_mode == "standalone"
 
-- name: download acme.sh
-  become: True
-  get_url:
+- name: Download acme.sh
+  become: true
+  ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/Neilpang/acme.sh/master/acme.sh
     dest: /tmp/acme.sh
-    mode: 0500
+    mode: "0500"
   register: download
 
-- name: install acme.sh
-  become: True
+- name: Install acme.sh
+  become: true
   shell: INSTALLONLINE=1 /tmp/acme.sh
            --install
            --home "{{ letsencrypt_base_dir }}"
   args:
     chdir: "/tmp"
-  when: download.changed
+  environment:
+    INSTALLONLINE: "1"
+  changed_when: false
+  when: download.changed # noqa: no-handler
 
 - name: Ensure deploy-directory exists
-  file:
+  become: true
+  ansible.builtin.file:
     path: "{{ letsencrypt_base_dir }}/deploy"
     state: directory
-  become: true
+    mode: "0755"
 
-- name: install deploy scripts
-  become: True
-  copy:
+- name: Install deploy scripts
+  become: true
+  ansible.builtin.copy:
     src: deploy_{{ item }}.sh
     dest: "{{ letsencrypt_base_dir }}/deploy/{{ item }}.sh"
-    mode: 0500
+    mode: "0500"
   with_items:
     - freeipa
     - freeipa_staging
