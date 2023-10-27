@@ -10,9 +10,9 @@
       -w "{{ letsencrypt_webroot }}"
       --pre-hook "{{ letsencrypt_issue.prehook }}"
       --post-hook "{{ letsencrypt_issue.posthook }}"
-  register: issue_web
-  failed_when: issue_web.rc == 1
-  changed_when: issue_web.rc == 0
+  register: issueW
+  failed_when: issueW.rc == 1
+  changed_when: issueW.rc == 0
   when: letsencrypt_issue_mode == "webroot"
 
 - name: Issue the certificate (standalone)
@@ -27,7 +27,7 @@
       --httpport {{ letsencrypt_port }}
       --pre-hook "{{ letsencrypt_issue.prehook }}"
       --post-hook "{{ letsencrypt_issue.posthook }}"
-  register: issue_standalone
-  failed_when: issue_standalone.rc == 1
-  changed_when: issue_standalone.rc == 0
+  register: issueS
+  failed_when: issueS.rc == 1
+  changed_when: issueS.rc == 0
   when: letsencrypt_issue_mode == "standalone"
