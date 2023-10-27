@@ -2,7 +2,7 @@
 - name: Issue the certificate (webroot)
   become: true
   ansible.builtin.command: >
-    {{ letsencrypt_base_dir }}/acme.sh --issue --server letsencrypt
+    {{ letsencrypt_base_dir }}/acme.sh --issue
       -d "{{ letsencrypt_domain }}"
       {% for item in letsencrypt_domain_extra %} -d {{ item }}{% endfor %}
       {{ '--staging' if letsencrypt_staging else None }}
@@ -18,7 +18,7 @@
 - name: Issue the certificate (standalone)
   become: true
   ansible.builtin.command: >
-    {{ letsencrypt_base_dir }}/acme.sh --issue --server letsencrypt
+    {{ letsencrypt_base_dir }}/acme.sh --issue
       -d "{{ letsencrypt_domain }}"
       {% for item in letsencrypt_domain_extra %} -d {{ item }}{% endfor %}
       {{ '--staging' if letsencrypt_staging else None }}
