@@ -1,7 +1,7 @@
 ---
-- name: issue the certificate (webroot)
-  become: True
-  command: >
+- name: Issue the certificate (webroot)
+  become: true
+  ansible.builtin.command: >
     {{ letsencrypt_base_dir }}/acme.sh --issue
       -d "{{ letsencrypt_domain }}"
       {% for item in letsencrypt_domain_extra %} -d {{ item }}{% endfor %}
@@ -15,9 +15,9 @@
   changed_when: issueW.rc == 0
   when: letsencrypt_issue_mode == "webroot"
 
-- name: issue the certificate (standalone)
-  become: True
-  command: >
+- name: Issue the certificate (standalone)
+  become: true
+  ansible.builtin.command: >
     {{ letsencrypt_base_dir }}/acme.sh --issue
       -d "{{ letsencrypt_domain }}"
       {% for item in letsencrypt_domain_extra %} -d {{ item }}{% endfor %}

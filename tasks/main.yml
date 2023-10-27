@@ -1,25 +1,28 @@
 ---
-- import_tasks: install.yml
+- name: Install ACME client
+  ansible.builtin.import_tasks: install.yml
 
-- name: copy root certificates
-  become: True
-  copy:
+- name: Copy root certificates
+  become: true
+  ansible.builtin.copy:
     src: "{{ item }}"
-    dest: "{{ letsencrypt_base_dir}}/{{ letsencrypt_domain }}/"
+    dest: "{{ letsencrypt_base_dir }}/{{ letsencrypt_domain }}/"
+    mode: "0640"
   with_items: "{{ letsencrypt_staging | ternary(certs_staging, certs_prod) }}"
 
-- name: remove root certificates
-  become: True
-  file:
+- name: Remove root certificates
+  become: true
+  ansible.builtin.file:
     path: "{{ item }}"
     state: absent
-  with_items:  "{{ letsencrypt_staging | ternary(certs_prod, certs_staging) }}"
+  with_items: "{{ letsencrypt_staging | ternary(certs_prod, certs_staging) }}"
 
-- import_tasks: issue.yml
+- name: Issue certificate
+  ansible.builtin.import_tasks: issue.yml
 
-- name: install the certificate
-  become: True
-  command: >
+- name: Install the certificate
+  become: true
+  ansible.builtin.command: >
     {{ letsencrypt_base_dir }}/acme.sh --install-cert
       -d "{{ letsencrypt_domain }}"
       --cert-file "{{ letsencrypt_install.cert_path }}"
@@ -27,15 +30,24 @@
       --ca-file "{{ letsencrypt_install.ca_path }}"
       --fullchain-file "{{ letsencrypt_install.fullchain_path }}"
       --reloadcmd "{{ letsencrypt_reloadcmd }}"
+  changed_when: false
   when: letsencrypt_install_mode == "install" and issueW.changed
 
-- name: deploy the certificate
-  become: True
-  command: >
+- name: Deploy the certificate
+  become: true
+  ansible.builtin.command: >
     {{ letsencrypt_base_dir }}/acme.sh --deploy
       -d "{{ letsencrypt_domain }}"
       --deploy-hook "{{ letsencrypt_deploy.staging_hook if letsencrypt_staging else letsencrypt_deploy.hook }}"
-  when: letsencrypt_install_mode == "deploy" and (issueW.changed or issueS.changed) and letsencrypt_deploy.hook != "freeipa" and letsencrypt_deploy.staging_hook != "freeipa_staging"
+  changed_when: false
+  when:
+    - letsencrypt_install_mode == "deploy"
+    - issueW.changed or issueS.changed
+    - letsencrypt_deploy.hook != "freeipa"
+    - letsencrypt_deploy.staging_hook != "freeipa_staging"
 
-- import_tasks: freeipa.yml
-  when: letsencrypt_deploy.hook == "freeipa" and letsencrypt_deploy.staging_hook == "freeipa_staging"
+- name: Run FreeIPA specific tasks
+  ansible.builtin.import_tasks: freeipa.yml
+  when:
+    - letsencrypt_deploy.hook == "freeipa"
+    - letsencrypt_deploy.staging_hook == "freeipa_staging"

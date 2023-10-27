@@ -1,30 +1,32 @@
 - name: Load settings (prod)
-  include_vars:
+  ansible.builtin.include_vars:
     file: "{{ item }}"
-  no_log: True
+  no_log: true
   with_items:
     - freeipa_secrets.yml
   when: "'production' in inventory_file"
 
 - name: Load settings (test)
-  include_vars:
+  ansible.builtin.include_vars:
     file: "{{ item }}"
-  no_log: True
+  no_log: true
   with_items:
     - freeipa_secrets_test.yml
   when: "'test' in inventory_file"
 
-- assert:
+- name: Assert dirsrv_instance is defined
+  ansible.builtin.assert:
     that:
       - "letsencrypt_deploy.dirsrv_instance is defined"
 
-- name: deploy the certificate
-  become: True
-  command: >
+- name: Deploy the certificate
+  become: true
+  ansible.builtin.command: >
     {{ letsencrypt_base_dir }}/acme.sh --deploy
       -d "{{ letsencrypt_domain }}"
       --deploy-hook "{{ letsencrypt_deploy.staging_hook if letsencrypt_staging else letsencrypt_deploy.hook }}"
   environment:
     DIRMAN_PASSWORD: "{{ freeipa_secrets.dm_password }}"
     DIRSRV_INSTANCE: "{{ letsencrypt_deploy.dirsrv_instance }}"
+  changed_when: false
   when: letsencrypt_install_mode == "deploy" and (issueW.changed or issueS.changed)
