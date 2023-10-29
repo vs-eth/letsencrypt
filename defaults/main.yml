@@ -12,6 +12,7 @@ letsencrypt_webroot: "/var/www/letsencrypt"
 letsencrypt_issue:
   prehook: ""
   posthook: ""
+  renewhook: ""
 
 letsencrypt_install:
   cert_path: "/etc/ssl/certs/{{ letsencrypt_domain | replace('.', '_') }}.cer"
