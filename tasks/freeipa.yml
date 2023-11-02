@@ -29,4 +29,4 @@
     DIRMAN_PASSWORD: "{{ freeipa_secrets.dm_password }}"
     DIRSRV_INSTANCE: "{{ letsencrypt_deploy.dirsrv_instance }}"
   changed_when: false
-  when: letsencrypt_install_mode == "deploy" and (issueW.changed or issueS.changed)
+  when: letsencrypt_install_mode == "deploy" and (issue_web.changed or issue_standalone.changed)
