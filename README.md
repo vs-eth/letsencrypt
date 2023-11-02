@@ -13,7 +13,7 @@ Role to setup Let's Encrypt certificates
 |letsencrypt_issue_mode|`webroot`| Whether to use `webroot` or `standalone` mode (see below)|
 |letsencrypt_install_mode|`install`| Whether to `install` or `deploy` the certificate |
 |letsencrypt_webroot|`/var/www/letsencrypt`|The directory to use as webroot (if using webroot mode)|
-|letsencrypt_issue|empty|Pre/post commands for certificate issurance|
+|letsencrypt_issue|empty|Pre/post/renew commands for certificate issurance|
 |letsencrypt_install|see defaults/main.yml|Where to install the certificate to (if installing)|
 |letsencrypt_reloadcmd|Empty|Command to execute after installing new certificates (if installing)|
 |letsencrypt_deploy|Empty|Hooks to use (if using deploy mode)|
