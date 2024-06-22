@@ -8,6 +8,7 @@ letsencrypt_staging: true
 letsencrypt_issue_mode: "webroot"
 letsencrypt_install_mode: "install"
 letsencrypt_webroot: "/var/www/letsencrypt"
+letsencrypt_ecc: false
 
 letsencrypt_issue:
   prehook: ""
