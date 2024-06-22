@@ -30,6 +30,7 @@
       --ca-file "{{ letsencrypt_install.ca_path }}"
       --fullchain-file "{{ letsencrypt_install.fullchain_path }}"
       --reloadcmd "{{ letsencrypt_reloadcmd }}"
+      {{ '--ecc' if letsencrypt_ecc else None }}
   changed_when: false
   when: letsencrypt_install_mode == "install" and (issue_web.changed or issue_standalone.changed)
 
@@ -39,6 +40,7 @@
     {{ letsencrypt_base_dir }}/acme.sh --deploy
       -d "{{ letsencrypt_domain }}"
       --deploy-hook "{{ letsencrypt_deploy.staging_hook if letsencrypt_staging else letsencrypt_deploy.hook }}"
+      {{ '--ecc' if letsencrypt_ecc else None }}
   changed_when: false
   when:
     - letsencrypt_install_mode == "deploy"
