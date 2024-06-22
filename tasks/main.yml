@@ -31,7 +31,7 @@
       --fullchain-file "{{ letsencrypt_install.fullchain_path }}"
       --reloadcmd "{{ letsencrypt_reloadcmd }}"
   changed_when: false
-  when: letsencrypt_install_mode == "install" and issue_web.changed
+  when: letsencrypt_install_mode == "install" and (issue_web.changed or issue_standalone.changed)
 
 - name: Deploy the certificate
   become: true
